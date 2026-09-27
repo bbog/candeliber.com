@@ -2,8 +2,11 @@
   "name": "candeliber.com",
   "version": "1.0.0",
   "description": "Sursa site-ului [Când e liber?](http://candeliber.com)",
-  "main": "gulpfile.js",
+  "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,10 +20,8 @@
   },
   "homepage": "https://github.com/bbog/candeliber.com#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^2.0.13",
-    "gulp-concat": "^2.6.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^2.0.0"
+    "vite": "^8.3.1",
+    "vite-plugin-pwa": "^1.3.0",
+    "workbox-precaching": "^7.4.1"
   }
 }

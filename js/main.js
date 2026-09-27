@@ -1,5 +1,7 @@
 //! version : 0.1.0
 //! license : MIT, authors : Bogdan BUCUR, candeliber.com
+import { Data } from './data.js';
+
 var Util = {
 
     get: function (id) {
@@ -320,7 +322,7 @@ ViewUtil.updateHollidaysList();
 
 // Register the service worker for offline access
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v012').then(function(registration) {
+  navigator.serviceWorker.register('sw.js').then(function(registration) {
     // Registration was successful
     console.log('ServiceWorker registration successful with scope: ', registration.scope);
   }).catch(function(err) {

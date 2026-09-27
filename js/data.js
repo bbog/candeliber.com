@@ -1,4 +1,4 @@
-var Data = {
+export const Data = {
 
     hollidays: [
         {
@@ -184,7 +184,3 @@ var Data = {
         weekend_day: 'Nu e sărbătoare dar azi nu se lucrează, e weekend! Woohoo'
     }
 };
-
-if (typeof exports !== 'undefined') {
-    exports.Data = Data;
-}

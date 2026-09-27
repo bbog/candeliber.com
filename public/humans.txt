@@ -1,0 +1,16 @@
+/* TEAM */                            
+Author: Bogdan BUCUR.
+Site: https://bogdanbucur.eu
+Location: Bucharest, Romania
+
+							
+/* THANKS */
+Google: https://google.com
+StackOverflow: https://stackoverflow.com
+
+                            
+/* SITE */                
+Last update: 20/09/2016     
+Standards: HTML5, CSS3
+Components: MomentJS                      
+Software: SublimeText
