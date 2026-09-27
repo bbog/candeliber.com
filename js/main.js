@@ -30,66 +30,128 @@ var Util = {
 var DateUtil = {
 
 
+    parseHollidayDate: function (date_str) {
+
+        var parts = date_str.split('/'),
+            day   = Number(parts[0]),
+            month = Number(parts[1]),
+            year  = Number(parts[2]);
+
+        return new Date(year, month - 1, day);
+    },
+
+
     getNearestHolliday: function () {
 
         // hollidays_past never contains a future date, so it's skipped here - only
         // the current and next year's lists can hold the next upcoming holliday.
-        var current_timestamp = DateUtil.getCurrentTimestamp(),
-            upcoming_hollidays = Data.hollidays.concat(Data.hollidays_future),
-            nearest_holliday = DateUtil.getNearestHollidayToTimestamp(current_timestamp, upcoming_hollidays);
+        var upcoming_hollidays = Data.hollidays.concat(Data.hollidays_future),
+            nearest_holliday = DateUtil.getNearestUpcomingHolliday(upcoming_hollidays);
 
         return nearest_holliday;
     },
 
 
-    getNearestHollidayToTimestamp: function (timestamp, hollidays) {
+    getNearestUpcomingHolliday: function (hollidays) {
 
-        var date = moment(timestamp, 'X');
+        var now = Date.now();
 
         var index = 0,
             total_hollidays = hollidays.length;
         for ( ; index < total_hollidays; index++) {
 
             var holliday = hollidays[index],
-                holliday_date = moment(holliday.date, "DD/MM/YYYY"),
-                difference = holliday_date.diff();
+                holliday_date = DateUtil.parseHollidayDate(holliday.date);
 
-
-
-            if (difference > 0) {
+            if (holliday_date.getTime() - now > 0) {
                 return holliday;
             }
         }
     },
 
 
+    // Calendar-based (not millisecond-based) difference between two dates: how many
+    // whole years/months/days/hours/minutes/seconds separate them, expressed the way
+    // a person would describe it (e.g. "1 month, 3 days"), regardless of which date
+    // comes first.
     getTimeBetweenDates: function (first_date, second_date) {
 
-        var diff = moment.preciseDiff(first_date, second_date, true);
+        var m1 = first_date,
+            m2 = second_date;
 
-        return diff;
-    },
+        // Shift m1's wall-clock reading onto m2's UTC offset first, so a DST change
+        // between the two dates (e.g. counting down to a December holiday from
+        // September, crossing the October switch) doesn't throw the hour count off
+        // by one.
+        m1 = new Date(m1.getTime() + (m1.getTimezoneOffset() - m2.getTimezoneOffset()) * 60000);
 
+        if (m1.getTime() > m2.getTime()) {
+            var tmp = m1;
+            m1 = m2;
+            m2 = tmp;
+        }
 
-    getCurrentTimestamp: function () {
-        return moment().unix();
+        var yDiff   = m2.getFullYear() - m1.getFullYear(),
+            mDiff   = m2.getMonth() - m1.getMonth(),
+            dDiff   = m2.getDate() - m1.getDate(),
+            hourDiff = m2.getHours() - m1.getHours(),
+            minDiff  = m2.getMinutes() - m1.getMinutes(),
+            secDiff  = m2.getSeconds() - m1.getSeconds();
+
+        if (secDiff < 0) {
+            secDiff += 60;
+            minDiff--;
+        }
+        if (minDiff < 0) {
+            minDiff += 60;
+            hourDiff--;
+        }
+        if (hourDiff < 0) {
+            hourDiff += 24;
+            dDiff--;
+        }
+        if (dDiff < 0) {
+            // Day 0 of m2's month is the last day of the month right before it.
+            var days_in_last_full_month = new Date(m2.getFullYear(), m2.getMonth(), 0).getDate();
+            if (days_in_last_full_month < m1.getDate()) {
+                // e.g. 31 Jan -> 2 Mar: Feb (28 days) is shorter than m1's day-of-month,
+                // so the extra days beyond Feb's length carry over too.
+                dDiff = days_in_last_full_month + dDiff + (m1.getDate() - days_in_last_full_month);
+            } else {
+                dDiff = days_in_last_full_month + dDiff;
+            }
+            mDiff--;
+        }
+        if (mDiff < 0) {
+            mDiff += 12;
+            yDiff--;
+        }
+
+        return {
+            years: yDiff,
+            months: mDiff,
+            days: dDiff,
+            hours: hourDiff,
+            minutes: minDiff,
+            seconds: secDiff
+        };
     },
 
 
     getDayNameFromDate: function (date) {
 
-        var day_index = moment(date, "DD/MM/YYYY").day(),
+        var day_index = DateUtil.parseHollidayDate(date).getDay(),
             day = Data.localization.days[day_index];
 
         return day;
     },
 
 
-    isWeekend: function (moment_date) {
+    isWeekend: function (date) {
 
-        var day_index   = moment_date.day(),
+        var day_index   = date.getDay(),
             is_saturday = (day_index === 6),
-            is_sunday   = (day_index === 0); 
+            is_sunday   = (day_index === 0);
 
         if (is_saturday || is_sunday) {
             return true;
@@ -99,9 +161,9 @@ var DateUtil = {
     },
 
 
-    getDaysUntilWeekend: function (moment_date) {
+    getDaysUntilWeekend: function (date) {
 
-        var day_index = moment_date.day();
+        var day_index = date.getDay();
         if (day_index === 0 || day_index === 6) {
             return 0;
         } else {
@@ -167,7 +229,7 @@ var ViewUtil = {
      */
     setBackground: function () {
 
-        var current_date = moment(DateUtil.getCurrentTimestamp(), 'X'),
+        var current_date = new Date(),
             is_weekend = DateUtil.isWeekend(current_date);
 
         if (is_weekend) {
@@ -189,7 +251,7 @@ var ViewUtil = {
 
     setHollidayStatus: function () {
 
-        var current_date = moment(DateUtil.getCurrentTimestamp(), 'X'),
+        var current_date = new Date(),
             is_weekend = DateUtil.isWeekend(current_date);
 
         if (is_weekend) {
@@ -242,12 +304,12 @@ var ViewUtil = {
     initCountdown: function () {
 
         var holliday = ViewUtil.nearest_holliday,
-            holliday_date = moment(holliday.date, "DD/MM/YYYY");
+            holliday_date = DateUtil.parseHollidayDate(holliday.date);
 
 
         setInterval(function updateCountdown() {
 
-            var current_date  = moment(DateUtil.getCurrentTimestamp(), 'X'),
+            var current_date  = new Date(),
                 difference = DateUtil.getTimeBetweenDates(holliday_date, current_date);
 
 
