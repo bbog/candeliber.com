@@ -79,10 +79,12 @@ function buildYearLinks(currentYear, ownYear) {
 // entry from js/data.js at build time, so index.html and the per-year pages can
 // never drift out of sync with the holiday list the way the hand-typed stats did.
 //
-// Canonical strategy (owner's call): every page's <link rel=canonical> points at
-// the home page, since home carries the full current-year content and the
-// per-year pages are near-duplicates meant to funnel ranking signal to it rather
-// than compete with it. og:url still reflects each page's own real address.
+// Canonical strategy (owner's call): the *current* year's page canonicalizes to
+// home, since its content is the same as home's - but the previous and next year's
+// pages are genuinely distinct content, so they canonicalize to themselves and stay
+// in the sitemap (see vite-plugins/sitemap.js, which excludes the current-year page
+// for the same reason). This is derived from Data.currentYear, not hardcoded, so it
+// flips automatically the moment the annual update bumps currentYear.
 export function seoContent() {
     return {
         name: 'candeliber-seo-content',
@@ -92,15 +94,17 @@ export function seoContent() {
                 const pageYear = yearFromPath(ctx.path);
                 const isYearPage = pageYear !== null;
                 const year = isYearPage ? pageYear : Data.currentYear;
+                const isCurrentYearPage = isYearPage && year === Data.currentYear;
 
-                const canonicalUrl = `${SITE_URL}/`;
                 const ogUrl = isYearPage ? `${SITE_URL}/zile-libere-${year}/` : `${SITE_URL}/`;
+                const canonicalUrl = isCurrentYearPage ? `${SITE_URL}/` : ogUrl;
 
                 const title = `Zile libere ${year} – Când e următoarea zi liberă? | Când e liber?`;
                 const ogTitle = `Zile libere ${year} – Când avem liber?`;
                 const description = `Câte zile libere sunt în ${year} în România? Vezi câte mai sunt ` +
                     `până la următoarea sărbătoare legală, câte cad în weekend și lista completă a ` +
                     `zilelor libere din ${year}.`;
+                const h1 = `Zile libere ${year} în România`;
                 const heading = `Lista completă a zilelor libere din ${year}`;
 
                 const yearHollidays = getYearHollidays(Data, year);
@@ -114,11 +118,12 @@ export function seoContent() {
                     .replaceAll('__DESCRIPTION__', description)
                     .replaceAll('__CANONICAL_URL__', canonicalUrl)
                     .replaceAll('__OG_URL__', ogUrl)
+                    .replaceAll('__H1__', h1)
                     .replaceAll('__HEADING__', heading)
                     .replaceAll('__STATS__', buildStatsSentence(yearHollidays, year))
                     .replaceAll('__TABLE_ROWS__', tableRows)
                     .replaceAll('__YEAR_LINKS__', yearLinks)
-                    .replaceAll('__JSON_LD__', buildJsonLd(yearHollidays, year, ogUrl))
+                    .replaceAll('__JSON_LD__', buildJsonLd(yearHollidays, year, canonicalUrl))
                     .replaceAll('__VERSION__', pkg.version);
             }
         }

@@ -32,11 +32,11 @@ export const Data = {
             date: '18/04/2025'
         },
         {
-            name: 'Paştele',
+            name: 'Paștele',
             date: '20/04/2025'
         },
         {
-            name: 'Paştele',
+            name: 'Paștele',
             date: '21/04/2025'
         },
         {
@@ -64,7 +64,7 @@ export const Data = {
             date: '30/11/2025'
         },
         {
-            name: 'Ziua Naţională a României',
+            name: 'Ziua Națională a României',
             date: '01/12/2025'
         },
         {
@@ -103,11 +103,11 @@ export const Data = {
             date: '10/04/2026'
         },
         {
-            name: 'Paştele',
+            name: 'Paștele',
             date: '12/04/2026'
         },
         {
-            name: 'Paştele',
+            name: 'Paștele',
             date: '13/04/2026'
         },
         {
@@ -131,7 +131,7 @@ export const Data = {
             date: '30/11/2026'
         },
         {
-            name: 'Ziua Naţională a României',
+            name: 'Ziua Națională a României',
             date: '01/12/2026'
         },
         {
@@ -174,11 +174,11 @@ export const Data = {
             date: '01/05/2027'
         },
         {
-            name: 'Paştele',
+            name: 'Paștele',
             date: '02/05/2027'
         },
         {
-            name: 'Paştele',
+            name: 'Paștele',
             date: '03/05/2027'
         },
         {
@@ -202,7 +202,7 @@ export const Data = {
             date: '30/11/2027'
         },
         {
-            name: 'Ziua Naţională a României',
+            name: 'Ziua Națională a României',
             date: '01/12/2027'
         },
         {

@@ -12,6 +12,17 @@ const expected = {
 
 let failed = false;
 
+// Romanian uses comma-below ș/ț/Ș/Ț (U+0219/U+021B/U+0218/U+021A), not the
+// cedilla ş/ţ/Ş/Ţ (U+015F/U+0163/U+015E/U+0162) that some fonts/keyboards produce
+// instead - catch any that sneak back into the holiday names.
+const cedillaPattern = /[şţŞŢ]/;
+for (const holliday of [...Data.hollidays_past, ...Data.hollidays, ...Data.hollidays_future]) {
+    if (cedillaPattern.test(holliday.name)) {
+        failed = true;
+        console.error(`FAIL: "${holliday.name}" (${holliday.date}) uses a cedilla ş/ţ/Ş/Ţ letter - use comma-below ș/ț/Ș/Ț instead`);
+    }
+}
+
 for (const [yearStr, expectedStats] of Object.entries(expected)) {
     const year = Number(yearStr);
     const stats = computeYearStats(getYearHollidays(Data, year), year);
