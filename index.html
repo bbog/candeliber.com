@@ -189,13 +189,14 @@
 
   <script src="js/moment.min.js"></script>
   <script type="module" src="js/main.js"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CB9D33P7GX"></script>
   <script>
-    !function (e, a, t, n, g, c, o) {
-      e.GoogleAnalyticsObject = g, e.ga = e.ga || function () {
-        (e.ga.q = e.ga.q || []).push(arguments)
-      }, e.ga.l = 1 * new Date, c = a.createElement(t), o = a.getElementsByTagName(t)[0], c.async = 1,
-        c.src = "https://www.google-analytics.com/analytics.js", o.parentNode.insertBefore(c, o)
-    }(window, document, "script", 0, "ga"), ga("create", "UA-80524379-1", "auto"), ga("send", "pageview")
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-CB9D33P7GX');
   </script>
 </body>
 </html>
