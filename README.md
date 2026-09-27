@@ -1,7 +1,7 @@
 # candeliber.com
 
 Sursa site-ului [Când e liber?](https://candeliber.com) — a live countdown to Romania's next
-public holiday, a weekend/workday status message, and the full list of that year's holidays, plus
+public holiday, a work/fun status badge, and the full list of that year's holidays, plus
 dedicated per-year pages (`/zile-libere-2025/`, `/zile-libere-2026/`, `/zile-libere-2027/`) for SEO.
 
 No backend — it's a static, multi-page site built with [Vite](https://vitejs.dev).
@@ -22,7 +22,8 @@ into the `*.html` / `js/` / `css/` files and get rebuilt.
 ## How it works
 
 - `js/data.js` holds all content: the current year, three years of holiday data
-  (`hollidays_past` / `hollidays` / `hollidays_future`), background photos, and localized strings.
+  (`hollidays_past` / `hollidays` / `hollidays_future`), and localized strings. Work/fun theming is
+  pure CSS (no background photos).
 - `js/holiday-stats.js` has the pure date/stat helpers, shared between the Vite build (Node) and
   the browser.
 - `vite-plugins/seo-content.js` and `vite-plugins/sitemap.js` generate SEO content (title, meta,

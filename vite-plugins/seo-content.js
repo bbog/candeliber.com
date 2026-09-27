@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { Data } from '../js/data.js';
-import { computeYearStats, formatHollidayDate, getDisplayHollidays, getYear, getYearHollidays, toIsoDate } from '../js/holiday-stats.js';
+import { computeYearStats, getDayIndex, getDisplayHollidays, getYear, getYearHollidays, toIsoDate } from '../js/holiday-stats.js';
 
 const SITE_URL = 'https://candeliber.com';
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -16,12 +16,23 @@ function buildStatsSentence(yearHollidays, year) {
 // Home shows the current year plus next year's Jan 1-2 (see getDisplayHollidays), so
 // those trailing rows get the year appended to their name to stay visually distinct,
 // same as the site has always done by hand ("Anul Nou 2027").
+//
+// Each row's leading dot is accent-colored for a "bonus" weekday holiday and muted
+// gray when the holiday already falls on a weekend, per the redesign's row markers.
 function buildTableRows(hollidays, { baseYear, suffixOtherYears }) {
     return hollidays.map((holliday) => {
         const year = getYear(holliday.date);
         const name = suffixOtherYears && year !== baseYear ? `${holliday.name} ${year}` : holliday.name;
-        const dateLabel = formatHollidayDate(holliday.date, Data.localization.months, Data.localization.days);
-        return `<tr><td>${dateLabel}</td><td>${name}</td></tr>`;
+        const [day, month] = holliday.date.split('/').map(Number);
+        const dayIndex = getDayIndex(holliday.date);
+        const dayName = Data.localization.days[dayIndex];
+        const isWeekendDay = dayIndex === 0 || dayIndex === 6;
+        const dotClass = isWeekendDay ? 'dot--muted' : 'dot--accent';
+        return `<tr>` +
+            `<td><span class="dot ${dotClass}"></span></td>` +
+            `<td class="days-list__date-cell">${day} ${Data.localization.months[month - 1]} <span class="days-list__weekday">(${dayName})</span></td>` +
+            `<td>${name}</td>` +
+            `</tr>`;
     }).join('\n        ');
 }
 

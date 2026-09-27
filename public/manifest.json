@@ -4,8 +4,8 @@
  "short_name": "Când e liber?",
  "description": "Vrei să știi cât mai e până la următoarea zi liberă? Facem noi calculul pentru tine!",
  "display": "standalone",
- "theme_color": "#2d2d2d",
- "background_color": "#ffffff",
+ "theme_color": "#172a41",
+ "background_color": "#172a41",
  "start_url": "/",
  "icons": [
   {

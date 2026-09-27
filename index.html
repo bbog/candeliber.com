@@ -25,81 +25,77 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/img/icon/apple-icon-180x180.png">
   <link rel="manifest" href="/manifest.json">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/css/style.css">
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
+  <div class="decor" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
   <div class="wrapper">
+    <header class="site-header">
+      <span class="wordmark">Când e liber?</span>
+      <span class="badge" id="state_badge" aria-live="polite"></span>
+    </header>
+
     <h1>Când e liber?</h1>
 
-    <p id="holliday_status"></p>
-
-    <p>
-      Următoarea zi liberă este pe data de <span id="holliday_date"></span>
-      (<span id="holliday_name"></span>) și pică într-o zi de <span id="holliday_day"></span>.
+    <p class="intro">
+      Următoarea zi liberă este pe data de <strong id="holliday_date"></strong>
+      (<span id="holliday_name"></span>) și pică într-o zi de <strong id="holliday_day"></strong>.
     </p>
 
-    <div class="countdown">
-      <div class="countdown__group">
-        <span class="countdown__digit" id="months_first_digit">0</span>
-        <span class="countdown__digit" id="months_second_digit">0</span>
-        <span class="countdown__label">luni</span>
+    <div class="countdown-grid">
+      <div class="cell">
+        <div class="value" id="countdown_days">00</div>
+        <div class="label">Zile</div>
       </div>
-      <span class="countdown__separator">:</span>
-      <div class="countdown__group">
-        <span class="countdown__digit" id="days_first_digit">0</span>
-        <span class="countdown__digit" id="days_second_digit">0</span>
-        <span class="countdown__label">zile</span>
+      <div class="cell">
+        <div class="value" id="countdown_hours">00</div>
+        <div class="label">Ore</div>
       </div>
-      <span class="countdown__separator">:</span>
-      <div class="countdown__group">
-        <span class="countdown__digit" id="hours_first_digit">0</span>
-        <span class="countdown__digit" id="hours_second_digit">0</span>
-        <span class="countdown__label">ore</span>
+      <div class="cell">
+        <div class="value" id="countdown_minutes">00</div>
+        <div class="label">Minute</div>
       </div>
-      <span class="countdown__separator">:</span>
-      <div class="countdown__group">
-        <span class="countdown__digit" id="minutes_first_digit">0</span>
-        <span class="countdown__digit" id="minutes_second_digit">0</span>
-        <span class="countdown__label">minute</span>
-      </div>
-      <span class="countdown__separator">:</span>
-      <div class="countdown__group">
-        <span class="countdown__digit" id="seconds_first_digit">0</span>
-        <span class="countdown__digit" id="seconds_second_digit">0</span>
-        <span class="countdown__label">secunde</span>
+      <div class="cell">
+        <div class="value" id="countdown_seconds">00</div>
+        <div class="label">Secunde</div>
       </div>
     </div>
-
-    <br>
 
     <p class="stats">__STATS__</p>
 
     <h2>__HEADING__</h2>
 
-    <table cellpadding="0" cellspacing="0" class="days-list" id="days-list">
-      <thead>
-        <tr>
-          <th scope="col" class="days-list__date-column">Data</th>
-          <th scope="col" class="days-list__name-column">Sărbătoare</th>
-        </tr>
-      </thead>
-      <tbody>
-        __TABLE_ROWS__
-      </tbody>
-    </table>
+    <div class="days-list-panel">
+      <table cellpadding="0" cellspacing="0" class="days-list" id="days-list">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Data</th>
+            <th scope="col">Sărbătoare</th>
+          </tr>
+        </thead>
+        <tbody>
+          __TABLE_ROWS__
+        </tbody>
+      </table>
+    </div>
 
     <p class="year-links">__YEAR_LINKS__</p>
 
-    <div class="social-wrapper">
-      <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcandeliber.com%2F" target="_blank" rel="noopener noreferrer" class="share-link">Distribuie pe Facebook</a>
-    </div>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcandeliber.com%2F" target="_blank" rel="noopener noreferrer" class="share-link">Distribuie pe Facebook <span aria-hidden="true">↗</span></a>
 
     <footer>
-      <p>Realizat de <a href="https://bogdanbucur.eu" title="Bogdan Bucur">Bogdan BUCUR</a></p>
-      <p>Sursa imaginii de fundal: <a href="https://www.pexels.com/" title="Pexels" id="bg_source">Pexels</a></p>
-      <p>v__VERSION__</p>
+      <span>Realizat de <a href="https://bogdanbucur.eu" title="Bogdan Bucur">Bogdan BUCUR</a></span>
+      <span>v__VERSION__</span>
     </footer>
   </div>
 

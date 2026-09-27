@@ -10,11 +10,6 @@ var Util = {
     },
 
 
-    getRandomInt: function (min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
-    },
-
-
     getDoubleDigitsFromValue: function (value) {
 
         value = value + '';
@@ -22,7 +17,7 @@ var Util = {
             value = '0' + value;
         }
 
-        return value.split('');
+        return value;
     }
 };
 
@@ -70,74 +65,6 @@ var DateUtil = {
     },
 
 
-    // Calendar-based (not millisecond-based) difference between two dates: how many
-    // whole years/months/days/hours/minutes/seconds separate them, expressed the way
-    // a person would describe it (e.g. "1 month, 3 days"), regardless of which date
-    // comes first.
-    getTimeBetweenDates: function (first_date, second_date) {
-
-        var m1 = first_date,
-            m2 = second_date;
-
-        // Shift m1's wall-clock reading onto m2's UTC offset first, so a DST change
-        // between the two dates (e.g. counting down to a December holiday from
-        // September, crossing the October switch) doesn't throw the hour count off
-        // by one.
-        m1 = new Date(m1.getTime() + (m1.getTimezoneOffset() - m2.getTimezoneOffset()) * 60000);
-
-        if (m1.getTime() > m2.getTime()) {
-            var tmp = m1;
-            m1 = m2;
-            m2 = tmp;
-        }
-
-        var yDiff   = m2.getFullYear() - m1.getFullYear(),
-            mDiff   = m2.getMonth() - m1.getMonth(),
-            dDiff   = m2.getDate() - m1.getDate(),
-            hourDiff = m2.getHours() - m1.getHours(),
-            minDiff  = m2.getMinutes() - m1.getMinutes(),
-            secDiff  = m2.getSeconds() - m1.getSeconds();
-
-        if (secDiff < 0) {
-            secDiff += 60;
-            minDiff--;
-        }
-        if (minDiff < 0) {
-            minDiff += 60;
-            hourDiff--;
-        }
-        if (hourDiff < 0) {
-            hourDiff += 24;
-            dDiff--;
-        }
-        if (dDiff < 0) {
-            // Day 0 of m2's month is the last day of the month right before it.
-            var days_in_last_full_month = new Date(m2.getFullYear(), m2.getMonth(), 0).getDate();
-            if (days_in_last_full_month < m1.getDate()) {
-                // e.g. 31 Jan -> 2 Mar: Feb (28 days) is shorter than m1's day-of-month,
-                // so the extra days beyond Feb's length carry over too.
-                dDiff = days_in_last_full_month + dDiff + (m1.getDate() - days_in_last_full_month);
-            } else {
-                dDiff = days_in_last_full_month + dDiff;
-            }
-            mDiff--;
-        }
-        if (mDiff < 0) {
-            mDiff += 12;
-            yDiff--;
-        }
-
-        return {
-            years: yDiff,
-            months: mDiff,
-            days: dDiff,
-            hours: hourDiff,
-            minutes: minDiff,
-            seconds: secDiff
-        };
-    },
-
-
     getDayNameFromDate: function (date) {
 
         var day_index = DateUtil.parseHollidayDate(date).getDay(),
@@ -161,61 +88,54 @@ var DateUtil = {
     },
 
 
-    getDaysUntilWeekend: function (date) {
+    // Whether `date` (a plain Date, compared by calendar day) is in this or next
+    // year's holiday list - the only two lists that can ever contain "today".
+    isHolliday: function (date) {
 
-        var day_index = date.getDay();
-        if (day_index === 0 || day_index === 6) {
-            return 0;
-        } else {
-            // -1 to exclude the current day
-            var days_left = 6 - day_index - 1;
-            return days_left;
-        }
+        var relevant_hollidays = Data.hollidays.concat(Data.hollidays_future);
+
+        return relevant_hollidays.some(function (holliday) {
+            var holliday_date = DateUtil.parseHollidayDate(holliday.date);
+            return holliday_date.getFullYear() === date.getFullYear() &&
+                holliday_date.getMonth() === date.getMonth() &&
+                holliday_date.getDate() === date.getDate();
+        });
+    },
+
+
+    isFun: function (date) {
+        return DateUtil.isWeekend(date) || DateUtil.isHolliday(date);
     }
 };
 
 
 var View = (function () {
 
-    var bg_source = Util.get('bg_source'),
-        bg_body   = document.body;
+    var body = document.body;
 
-    var holliday_status = Util.get('holliday_status');
+    var state_badge = Util.get('state_badge');
 
     var holliday_date = Util.get('holliday_date'),
         holliday_name = Util.get('holliday_name'),
         holliday_day  = Util.get('holliday_day');
 
-    var months_first_digit   = Util.get('months_first_digit'),
-        months_second_digit  = Util.get('months_second_digit'),
-        days_first_digit     = Util.get('days_first_digit'),
-        days_second_digit    = Util.get('days_second_digit'),
-        hours_first_digit    = Util.get('hours_first_digit'),
-        hours_second_digit   = Util.get('hours_second_digit'),
-        minutes_first_digit  = Util.get('minutes_first_digit'),
-        minutes_second_digit = Util.get('minutes_second_digit'),
-        seconds_first_digit  = Util.get('seconds_first_digit'),
-        seconds_second_digit = Util.get('seconds_second_digit');
+    var countdown_days    = Util.get('countdown_days'),
+        countdown_hours   = Util.get('countdown_hours'),
+        countdown_minutes = Util.get('countdown_minutes'),
+        countdown_seconds = Util.get('countdown_seconds');
 
     var hollidays_list_table = Util.get('days-list');
 
     return {
-        bg_source: bg_source,
-        bg_body: bg_body,
-        holliday_status: holliday_status,
+        body: body,
+        state_badge: state_badge,
         holliday_date: holliday_date,
         holliday_name: holliday_name,
         holliday_day: holliday_day,
-        months_first_digit: months_first_digit,
-        months_second_digit: months_second_digit,
-        days_first_digit: days_first_digit,
-        days_second_digit: days_second_digit,
-        hours_first_digit: hours_first_digit,
-        hours_second_digit: hours_second_digit,
-        minutes_first_digit: minutes_first_digit,
-        minutes_second_digit: minutes_second_digit,
-        seconds_first_digit: seconds_first_digit,
-        seconds_second_digit: seconds_second_digit,
+        countdown_days: countdown_days,
+        countdown_hours: countdown_hours,
+        countdown_minutes: countdown_minutes,
+        countdown_seconds: countdown_seconds,
         hollidays_list_table: hollidays_list_table
     }
 })();
@@ -224,63 +144,15 @@ var View = (function () {
 var ViewUtil = {
 
     /**
-     * Sets a random background image and makes sure the link in the footer 
-     * points to the original source 
+     * Toggles the work/fun theme (via body[data-state]) and the header badge
+     * label, based on whether today is a weekend or holiday.
      */
-    setBackground: function () {
+    setStateBadge: function () {
 
-        var current_date = new Date(),
-            is_weekend = DateUtil.isWeekend(current_date);
+        var is_fun = DateUtil.isFun(new Date());
 
-        if (is_weekend) {
-            var photos = Data.photos.holliday,
-                photos_folder = 'holliday';
-        } else {
-            var photos = Data.photos.working,
-                photos_folder = 'working';
-        }
-
-
-        var random_index = Util.getRandomInt(0, photos.length),
-            bg_image = photos[random_index];
-
-        View.bg_body.style.backgroundImage = 'url(\'img/' + photos_folder + '/' + bg_image.path + '\')';
-        View.bg_source.href = bg_image.source;
-    },
-
-
-    setHollidayStatus: function () {
-
-        var current_date = new Date(),
-            is_weekend = DateUtil.isWeekend(current_date);
-
-        if (is_weekend) {
-            var message = Data.messages.weekend_day;
-        } else {
-            var message = Data.messages.working_day,
-                days_until_weekend = DateUtil.getDaysUntilWeekend(current_date);
-
-            var weekend_status = '';
-            switch (days_until_weekend) {
-                case 0:
-                    weekend_status = Data.messages.weekend_tomorrow;
-                    break;
-
-                case 1:
-                    weekend_status = Data.messages.day_until_weekend;
-                    break;
-
-                default:
-                    weekend_status = Data.messages.days_until_weekend.replace('##days', days_until_weekend);
-                    break;
-
-
-            }
-
-            message += weekend_status;
-        }
-
-        View.holliday_status.innerHTML = message;
+        View.body.dataset.state = is_fun ? 'fun' : 'work';
+        View.state_badge.innerHTML = is_fun ? Data.messages.fun_state : Data.messages.work_state;
     },
 
 
@@ -295,9 +167,9 @@ var ViewUtil = {
 
         ViewUtil.nearest_holliday = holliday;
 
-        holliday_date.innerHTML = holliday.date;
-        holliday_name.innerHTML = holliday.name;
-        holliday_day.innerHTML  = day_name;
+        View.holliday_date.innerHTML = holliday.date;
+        View.holliday_name.innerHTML = holliday.name;
+        View.holliday_day.innerHTML  = day_name;
     },
 
 
@@ -309,30 +181,22 @@ var ViewUtil = {
 
         setInterval(function updateCountdown() {
 
-            var current_date  = new Date(),
-                difference = DateUtil.getTimeBetweenDates(holliday_date, current_date);
+            var current_date = new Date(),
+                diff = Math.max(0, holliday_date.getTime() - current_date.getTime());
 
+            var days    = Math.floor(diff / 86400000),
+                hours   = Math.floor((diff % 86400000) / 3600000),
+                minutes = Math.floor((diff % 3600000) / 60000),
+                seconds = Math.floor((diff % 60000) / 1000);
 
-            var months_digits = Util.getDoubleDigitsFromValue(difference.months);
-            View.months_first_digit.innerHTML  = months_digits[0];
-            View.months_second_digit.innerHTML = months_digits[1];
+            View.countdown_days.innerHTML    = Util.getDoubleDigitsFromValue(days);
+            View.countdown_hours.innerHTML   = Util.getDoubleDigitsFromValue(hours);
+            View.countdown_minutes.innerHTML = Util.getDoubleDigitsFromValue(minutes);
+            View.countdown_seconds.innerHTML = Util.getDoubleDigitsFromValue(seconds);
 
-            var days_digits = Util.getDoubleDigitsFromValue(difference.days);
-            View.days_first_digit.innerHTML  = days_digits[0];
-            View.days_second_digit.innerHTML = days_digits[1];
-
-            var hours_digits = Util.getDoubleDigitsFromValue(difference.hours);
-            View.hours_first_digit.innerHTML  = hours_digits[0];
-            View.hours_second_digit.innerHTML = hours_digits[1];
-
-            var minutes_digits = Util.getDoubleDigitsFromValue(difference.minutes);
-            View.minutes_first_digit.innerHTML  = minutes_digits[0];
-            View.minutes_second_digit.innerHTML = minutes_digits[1];
-
-            var seconds_digits = Util.getDoubleDigitsFromValue(difference.seconds);
-            View.seconds_first_digit.innerHTML  = seconds_digits[0];
-            View.seconds_second_digit.innerHTML = seconds_digits[1];
-            
+            // Recomputed every tick (not just once) so the work/fun theme and
+            // badge flip on their own right at midnight, without a page reload.
+            ViewUtil.setStateBadge();
 
         }, 1000);
     },
@@ -363,9 +227,7 @@ var ViewUtil = {
             nearest_holliday_reached = false;
         for ( ; index < total_hollidays; index++) {
 
-            var holliday_row = holliday_rows[index],
-                holliday_cells = holliday_row.getElementsByTagName('td'),
-                holliday_name_cell = holliday_cells[1];
+            var holliday_row = holliday_rows[index];
 
             if (nearest_holliday_reached) {
                 var row_class = 'days-list__holliday--future';
@@ -383,8 +245,7 @@ var ViewUtil = {
 }
 
 
-ViewUtil.setBackground();
-ViewUtil.setHollidayStatus();
+ViewUtil.setStateBadge();
 ViewUtil.setNearestHolliday();
 ViewUtil.initCountdown();
 ViewUtil.updateHollidaysList();
@@ -401,11 +262,3 @@ if ('serviceWorker' in navigator) {
     console.log('ServiceWorker registration failed: ', err);
   });
 }
-
-
-
-
-
-
-
-

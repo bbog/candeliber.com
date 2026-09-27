@@ -15,6 +15,10 @@ export function toIsoDate(dateStr) {
     return `${year}-${month}-${day}`;
 }
 
+export function getDayIndex(dateStr) {
+    return parseDMY(dateStr).getUTCDay();
+}
+
 // Data.hollidays_past/hollidays/hollidays_future each hold exactly one full year
 // (previous/current/next - see js/data.js), so picking the right one for a given
 // year is a straight lookup rather than a chronological-order/position assumption.
@@ -41,7 +45,7 @@ export function getDisplayHollidays(data) {
 
 export function formatHollidayDate(dateStr, months, days) {
     const [day, month] = dateStr.split('/').map(Number);
-    const dayName = days[parseDMY(dateStr).getUTCDay()];
+    const dayName = days[getDayIndex(dateStr)];
     return `${day} ${months[month - 1]} (${dayName})`;
 }
 

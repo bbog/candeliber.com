@@ -23,34 +23,45 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/img/icon/favicon-32x32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/icon/apple-icon-180x180.png">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/css/style.css">
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
   <div class="wrapper">
+    <a class="site-header" href="/">
+      <span class="wordmark">Când e liber?</span>
+    </a>
+
     <h1>__H1__</h1>
 
     <p class="stats">__STATS__</p>
 
     <h2>__HEADING__</h2>
 
-    <table cellpadding="0" cellspacing="0" class="days-list" id="days-list">
-      <thead>
-        <tr>
-          <th scope="col" class="days-list__date-column">Data</th>
-          <th scope="col" class="days-list__name-column">Sărbătoare</th>
-        </tr>
-      </thead>
-      <tbody>
-        __TABLE_ROWS__
-      </tbody>
-    </table>
+    <div class="days-list-panel">
+      <table cellpadding="0" cellspacing="0" class="days-list" id="days-list">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Data</th>
+            <th scope="col">Sărbătoare</th>
+          </tr>
+        </thead>
+        <tbody>
+          __TABLE_ROWS__
+        </tbody>
+      </table>
+    </div>
 
     <p class="year-links">__YEAR_LINKS__</p>
 
     <footer>
-      <p>Realizat de <a href="https://bogdanbucur.eu" title="Bogdan Bucur">Bogdan BUCUR</a></p>
+      <span>Realizat de <a href="https://bogdanbucur.eu" title="Bogdan Bucur">Bogdan BUCUR</a></span>
     </footer>
   </div>
 
