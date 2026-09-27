@@ -79,94 +79,94 @@ export const Data = {
 
         working: [
             {
-                path: 'people-coffee-notes-tea.jpg',
+                path: 'people-coffee-notes-tea.webp',
                 source: 'https://www.pexels.com/photo/people-notes-meeting-team-7095/'
             },
             {
-                path: 'people-coffee-tea-meeting.jpg',
+                path: 'people-coffee-tea-meeting.webp',
                 source: 'https://www.pexels.com/photo/people-meeting-workspace-team-7097/'
             },
             {
-                path: 'person-apple-laptop-notebook.jpg',
+                path: 'person-apple-laptop-notebook.webp',
                 source: 'https://www.pexels.com/photo/person-apple-laptop-notebook-1171/'
             },
             {
-                path: 'startup-photos.jpg',
+                path: 'startup-photos.webp',
                 source: 'https://www.pexels.com/photo/working-woman-person-technology-7375/'
             },
             {
-                path: 'office-notes-notepad-entrepreneur-38556.jpeg',
+                path: 'office-notes-notepad-entrepreneur-38556.webp',
                 source: 'https://www.pexels.com/photo/iphone-desk-office-pen-38556/'
             },
             {
-                path: 'bow-tie-businessman-fashion-man.jpg',
+                path: 'bow-tie-businessman-fashion-man.webp',
                 source: 'https://www.pexels.com/photo/bow-tie-businessman-fashion-man-1702/'
             },
             {
-                path: 'pexels-photo-52608.jpeg',
+                path: 'pexels-photo-52608.webp',
                 source: 'https://www.pexels.com/photo/man-in-white-shirt-using-macbook-pro-52608/'
             },
             {
-                path: 'medic-hospital-laboratory-medical-40559.jpeg',
+                path: 'medic-hospital-laboratory-medical-40559.webp',
                 source: 'https://www.pexels.com/photo/clinic-doctor-health-hospital-40559/'
             },
             {
-                path: 'startup-photos_2.jpg',
+                path: 'startup-photos_2.webp',
                 source: 'https://www.pexels.com/photo/laptop-computer-macbook-apple-7361/'
             },
             {
-                path: 'desk-office-workspace-coworking.jpg',
+                path: 'desk-office-workspace-coworking.webp',
                 source: 'https://www.pexels.com/photo/desk-office-workspace-coworking-7110/'
             },
             {
-                path: 'pexels-photo-89724.jpeg',
+                path: 'pexels-photo-89724.webp',
                 source: 'https://www.pexels.com/photo/people-apple-desk-technology-89724/'
             }
         ],
 
         holliday: [
             {
-                path: 'pexels-photo.jpeg',
+                path: 'pexels-photo.webp',
                 source: 'https://www.pexels.com/photo/man-person-view-nature-9692/'
             },
             {
-                path: 'pexels-photo-65977.jpeg',
+                path: 'pexels-photo-65977.webp',
                 source: 'https://www.pexels.com/photo/nature-beach-water-blue-65977/'
             },
             {
-                path: 'pexels-photo-61129.jpeg',
+                path: 'pexels-photo-61129.webp',
                 source: 'https://www.pexels.com/photo/sunglasses-girl-swimming-pool-swimming-61129/'
             },
             {
-                path: 'landscape-mountains-nature-man.jpg',
+                path: 'landscape-mountains-nature-man.webp',
                 source: 'https://www.pexels.com/photo/landscape-mountains-nature-man-1005/'
             },
             {
-                path: 'pexels-photo-46082.jpeg',
+                path: 'pexels-photo-46082.webp',
                 source: 'https://www.pexels.com/photo/man-in-black-shirt-and-gray-shorts-standing-on-cliff-under-white-and-blue-cloudy-sky-46082/'
             },
             {
-                path: 'pexels-photo.jpg',
+                path: 'pexels-photo-alt.webp',
                 source: 'https://www.pexels.com/photo/bridge-runners-morning-cloudy-29578/'
             },
             {
-                path: 'nature-person-red-woman.jpg',
+                path: 'nature-person-red-woman.webp',
                 source: 'https://www.pexels.com/photo/nature-person-red-woman-6552/'
             },
             {
-                path: 'person-beach-holiday-vacation.jpg',
+                path: 'person-beach-holiday-vacation.webp',
                 source: 'https://www.pexels.com/photo/person-beach-holiday-vacation-5314/'
             },
             {
-                path: 'pexels-photo-60219.jpeg',
+                path: 'pexels-photo-60219.webp',
                 source: 'https://www.pexels.com/photo/nature-beach-vacation-ocean-60219/'
             },
             {
-                path: 'pexels-photo-102734.jpeg',
+                path: 'pexels-photo-102734.webp',
                 source: 'https://www.pexels.com/photo/woman-in-white-crop-top-besides-man-in-white-and-black-stripes-shirt-beside-body-otf-water-102734/'
             },
             {
-                path: 'pexels-photo-26525.jpg',
+                path: 'pexels-photo-26525.webp',
                 source: 'https://www.pexels.com/photo/mountains-hill-man-person-26525/'
             }
         ]
