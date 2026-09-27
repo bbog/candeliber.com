@@ -23,10 +23,6 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/img/icon/favicon-32x32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/icon/apple-icon-180x180.png">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@400&family=Roboto:wght@400&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="/css/style.css">
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -58,14 +54,19 @@
     </footer>
   </div>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CB9D33P7GX"></script>
+  <!-- Google tag (gtag.js), loaded after window load so it doesn't compete for bandwidth during initial render -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-CB9D33P7GX');
+
+    window.addEventListener('load', function () {
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-CB9D33P7GX';
+      document.head.appendChild(script);
+    });
   </script>
 </body>
 </html>
