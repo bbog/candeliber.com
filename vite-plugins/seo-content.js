@@ -39,21 +39,14 @@ function buildJsonLd(yearHollidays, year, pageUrl) {
                 '@type': 'ItemList',
                 name: `Zilele libere din ${year} în România`,
                 url: pageUrl,
+                // Plain ListItems, not Event: Google's Event rich results need a specific
+                // Place with an address, which doesn't fit a country-wide public holiday,
+                // so an Event wrapper here would be valid but pointless markup.
                 itemListElement: yearHollidays.map((holliday, index) => ({
                     '@type': 'ListItem',
                     position: index + 1,
-                    item: {
-                        '@type': 'Event',
-                        name: holliday.name,
-                        startDate: toIsoDate(holliday.date),
-                        endDate: toIsoDate(holliday.date),
-                        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-                        eventStatus: 'https://schema.org/EventScheduled',
-                        location: {
-                            '@type': 'Country',
-                            name: 'România'
-                        }
-                    }
+                    name: holliday.name,
+                    description: toIsoDate(holliday.date)
                 }))
             }
         ]
@@ -117,7 +110,7 @@ export function seoContent() {
                     .replaceAll('__OG_TITLE__', ogTitle)
                     .replaceAll('__DESCRIPTION__', description)
                     .replaceAll('__CANONICAL_URL__', canonicalUrl)
-                    .replaceAll('__OG_URL__', ogUrl)
+                    .replaceAll('__OG_URL__', canonicalUrl)
                     .replaceAll('__H1__', h1)
                     .replaceAll('__HEADING__', heading)
                     .replaceAll('__STATS__', buildStatsSentence(yearHollidays, year))
