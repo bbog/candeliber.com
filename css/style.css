@@ -26,21 +26,39 @@ body {
 }
 
 h1 {
-	font-family: 'Open Sans Condensed';
+	font-family: 'Open Sans Condensed', sans-serif;
 	font-size: 2.6em;
+	color: #fff;
+}
+h2 {
+	font-family: 'Open Sans Condensed', sans-serif;
+	font-size: 1.6em;
 	color: #fff;
 }
 
 p {
-	font-family: 'Droid Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
 	font-size: 1em;
 	color: #fff;
 	margin: 1em 0.5em 1em 0.5em;
 }
 
+p.year-links {
+	margin: 1em auto 0;
+	max-width:710px;
+}
+
+p.year-links a {
+	color: #fff;
+}
+
+p.stats {
+	margin:0 auto;
+	max-width: 710px;
+}
 
 h3 {
-	font-family: 'Open Sans Condensed';
+	font-family: 'Open Sans Condensed', sans-serif;
 	font-size: 1.6em;
 	color: #fff;
 	margin-top: 2em;
@@ -119,13 +137,14 @@ h3 {
 	margin: 0 auto;
 	border: 0;
 	width: 710px;
-	font-family: 'Droid Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
 }
 
-.days-list thead td {
+.days-list thead th {
 	font-size: 0.9em;
 	color: #86878C;
 	text-align: left;
+	font-weight: normal;
 }
 
 .days-list__date-column {
@@ -136,7 +155,8 @@ h3 {
 
 }
 
-.days-list td {
+.days-list td,
+.days-list th {
 	padding: 0.5em;
 	border-bottom: 1px solid #737479;
 }
@@ -181,9 +201,24 @@ tr.days-list__holliday--current {
 	margin-top: 2em;
 }
 
+.share-link {
+	display: inline-block;
+	padding: 0.5em 1em;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #fff;
+	text-decoration: none;
+	font-family: 'Roboto', sans-serif;
+	font-size: 0.9em;
+}
+
+.share-link:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
 footer {
 	margin: 0.5em;
-	font-family: 'Droid Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
 	font-size: 0.8em;
 	color: #fff;
 }

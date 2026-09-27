@@ -1,13 +1,13 @@
 {
   "name": "candeliber.com",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Sursa site-ului [Când e liber?](http://candeliber.com)",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node scripts/verify-holiday-stats.mjs"
   },
   "repository": {
     "type": "git",

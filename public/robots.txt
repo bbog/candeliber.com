@@ -1,5 +1,4 @@
-User-Agent: *
-Disallow: 
-Disallow: /css
-Disallow: /js
-Disallow: /img
+User-agent: *
+Allow: /
+
+Sitemap: https://candeliber.com/sitemap.xml

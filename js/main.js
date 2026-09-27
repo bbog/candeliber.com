@@ -1,6 +1,7 @@
 //! version : 0.1.0
 //! license : MIT, authors : Bogdan BUCUR, candeliber.com
 import { Data } from './data.js';
+import { getDisplayHollidays } from './holiday-stats.js';
 
 var Util = {
 
@@ -31,8 +32,11 @@ var DateUtil = {
 
     getNearestHolliday: function () {
 
+        // hollidays_past never contains a future date, so it's skipped here - only
+        // the current and next year's lists can hold the next upcoming holliday.
         var current_timestamp = DateUtil.getCurrentTimestamp(),
-            nearest_holliday = DateUtil.getNearestHollidayToTimestamp(current_timestamp, Data.hollidays);
+            upcoming_hollidays = Data.hollidays.concat(Data.hollidays_future),
+            nearest_holliday = DateUtil.getNearestHollidayToTimestamp(current_timestamp, upcoming_hollidays);
 
         return nearest_holliday;
     },
@@ -279,8 +283,13 @@ var ViewUtil = {
             tbody = hollidays_list_table.getElementsByTagName('tbody')[0],
             holliday_rows = tbody.getElementsByTagName('tr');
 
+        // The table only ever renders the current year plus next year's Jan 1-2 (see
+        // getDisplayHollidays), so the index lookup has to match that same subset,
+        // not the separate hollidays_past/hollidays/hollidays_future arrays directly.
+        var displayed_hollidays = getDisplayHollidays(Data);
+
         var nearest_holliday_index;
-        Data.hollidays.forEach(function (holliday, index) {
+        displayed_hollidays.forEach(function (holliday, index) {
             if (holliday === nearest_holliday) {
                 nearest_holliday_index = index;
             }
