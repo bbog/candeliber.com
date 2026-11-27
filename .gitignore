@@ -3,3 +3,4 @@ node_modules/*
 *.md
 dist/
 design_handoff_candeliber_redesign
+*.DS_Store

@@ -27,56 +27,76 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/style.css">
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
-  <div class="decor" aria-hidden="true">
-    <span></span><span></span><span></span><span></span><span></span>
-  </div>
+  <!-- Sets the work/fun state before first paint, so weekend/holiday visitors don't see the
+       office scene flash before js/main.js (deferred module) loads. main.js re-applies the same
+       check and owns the state from then on (badge, midnight rollover). -->
+  <script>
+    (function (now, fun_dates) {
+      var pad = function (n) { return (n < 10 ? '0' : '') + n; },
+          today = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()),
+          day = now.getDay();
+      document.body.dataset.state = (day === 0 || day === 6 || fun_dates.indexOf(today) !== -1) ? 'fun' : 'work';
+    })(new Date(), __HOLLIDAY_DATES__);
+  </script>
+  __SCENE_WORK__
+  __SCENE_FUN__
 
   <div class="wrapper">
     <header class="site-header">
-      <span class="wordmark">Când e liber?</span>
+      <h1 class="wordmark">Când e liber?</h1>
       <span class="badge" id="state_badge" aria-live="polite"></span>
     </header>
 
-    <h1>Când e liber?</h1>
-
-    <p class="intro">
+    <p class="headline loose">
       Următoarea zi liberă este pe data de <strong id="holliday_date"></strong>
-      (<span id="holliday_name"></span>) și pică într-o zi de <strong id="holliday_day"></strong>.
+      <span class="headline__name">(<span id="holliday_name"></span>)</span> și pică într-o zi de <strong id="holliday_day"></strong>.
     </p>
 
-    <div class="countdown-grid">
-      <div class="cell">
-        <div class="value" id="countdown_days">00</div>
-        <div class="label">Zile</div>
+    <div class="countdown">
+      <div class="countdown__hero">
+        <div class="countdown__eyebrow">Mai sunt</div>
+        <div class="countdown__days">
+          <span class="countdown__days-value" id="countdown_days">0</span>
+          <span class="countdown__days-label" id="countdown_days_label">zile</span>
+        </div>
       </div>
-      <div class="cell">
-        <div class="value" id="countdown_hours">00</div>
-        <div class="label">Ore</div>
-      </div>
-      <div class="cell">
-        <div class="value" id="countdown_minutes">00</div>
-        <div class="label">Minute</div>
-      </div>
-      <div class="cell">
-        <div class="value" id="countdown_seconds">00</div>
-        <div class="label">Secunde</div>
+      <div class="countdown__side">
+        <div class="countdown__box countdown__box--hours">
+          <span class="countdown__value" id="countdown_hours">00</span>
+          <span class="countdown__label" id="countdown_hours_label">ore</span>
+        </div>
+        <div class="countdown__pair">
+          <div class="countdown__box">
+            <span class="countdown__value" id="countdown_minutes">00</span>
+            <span class="countdown__label" id="countdown_minutes_label">minute</span>
+          </div>
+          <div class="countdown__box">
+            <span class="countdown__value" id="countdown_seconds">00</span>
+            <span class="countdown__label" id="countdown_seconds_label">secunde</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <p class="stats">__STATS__</p>
+    <p class="stats loose">__STATS__</p>
 
-    <h2>__HEADING__</h2>
+    <h2 class="loose">__HEADING__</h2>
+
+    <div class="legend">
+      <span class="legend__item"><span class="dot dot--weekday"></span>pică în cursul săptămânii :)</span>
+      <span class="legend__item"><span class="dot dot--weekend"></span>pică în weekend :(</span>
+    </div>
 
     <div class="days-list-panel">
       <table cellpadding="0" cellspacing="0" class="days-list" id="days-list">
-        <thead>
+        <thead class="visually-hidden">
           <tr>
             <th scope="col"></th>
             <th scope="col">Data</th>
@@ -89,11 +109,11 @@
       </table>
     </div>
 
-    <p class="year-links">__YEAR_LINKS__</p>
+    <p class="year-links loose">__YEAR_LINKS__</p>
 
     <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcandeliber.com%2F" target="_blank" rel="noopener noreferrer" class="share-link">Distribuie pe Facebook <span aria-hidden="true">↗</span></a>
 
-    <footer>
+    <footer class="loose">
       <span>Realizat de <a href="https://bogdanbucur.eu" title="Bogdan Bucur">Bogdan BUCUR</a></span>
       <span>v__VERSION__</span>
     </footer>

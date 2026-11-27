@@ -223,10 +223,12 @@ export const Data = {
         ]
     },
 
-    // The two labels shown in the header badge, driven by ViewUtil.setStateBadge's
-    // isFun check (weekend or today is a holiday).
+    // The header badge labels, picked by ViewUtil.setStateBadge: a work day, a
+    // holiday (`{name}` is replaced with today's holiday name; this wins over the
+    // weekend label when a holiday falls on a weekend), or a plain weekend.
     messages: {
-        work_state: 'azi e zi de muncă',
-        fun_state: 'azi e liber'
+        work_state: 'Nu azi, azi se lucrează',
+        holliday_state: 'Azi e liber, e {name}!',
+        weekend_state: 'Azi e liber, e weekend, woohoo!'
     }
 };

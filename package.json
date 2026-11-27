@@ -1,6 +1,6 @@
 {
   "name": "candeliber.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Sursa site-ului [Când e liber?](http://candeliber.com)",
   "type": "module",
   "scripts": {

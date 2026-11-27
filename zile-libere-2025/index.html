@@ -25,27 +25,34 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/style.css">
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
+  __SCENE_WORK__
+
   <div class="wrapper">
     <a class="site-header" href="/">
       <span class="wordmark">Când e liber?</span>
     </a>
 
-    <h1>__H1__</h1>
+    <h1 class="headline loose">__H1__</h1>
 
-    <p class="stats">__STATS__</p>
+    <p class="stats loose">__STATS__</p>
 
-    <h2>__HEADING__</h2>
+    <h2 class="loose">__HEADING__</h2>
+
+    <div class="legend">
+      <span class="legend__item"><span class="dot dot--weekday"></span>pică în cursul săptămânii :)</span>
+      <span class="legend__item"><span class="dot dot--weekend"></span>pică în weekend :(</span>
+    </div>
 
     <div class="days-list-panel">
       <table cellpadding="0" cellspacing="0" class="days-list" id="days-list">
-        <thead>
+        <thead class="visually-hidden">
           <tr>
             <th scope="col"></th>
             <th scope="col">Data</th>
@@ -58,9 +65,9 @@
       </table>
     </div>
 
-    <p class="year-links">__YEAR_LINKS__</p>
+    <p class="year-links loose">__YEAR_LINKS__</p>
 
-    <footer>
+    <footer class="loose">
       <span>Realizat de <a href="https://bogdanbucur.eu" title="Bogdan Bucur">Bogdan BUCUR</a></span>
     </footer>
   </div>

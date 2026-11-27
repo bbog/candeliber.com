@@ -5,6 +5,11 @@ import { computeYearStats, getDayIndex, getDisplayHollidays, getYear, getYearHol
 const SITE_URL = 'https://candeliber.com';
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 
+// The illustrated work/fun background scenes are plain inline SVG kept in partials/,
+// injected here so the same markup isn't copy-pasted into every HTML entry. Read on
+// every transform (not once at load) so edits show up in the dev server right away.
+const readPartial = (name) => readFileSync(new URL(`../partials/${name}`, import.meta.url), 'utf8').trim();
+
 function buildStatsSentence(yearHollidays, year) {
     const { total, weekdayCount, longWeekends } = computeYearStats(yearHollidays, year);
     return `În total, în ${year} sunt <strong>${total}</strong> zile libere, dintre care ` +
@@ -14,24 +19,39 @@ function buildStatsSentence(yearHollidays, year) {
 }
 
 // Home shows the current year plus next year's Jan 1-2 (see getDisplayHollidays), so
-// those trailing rows get the year appended to their name to stay visually distinct,
-// same as the site has always done by hand ("Anul Nou 2027").
+// those trailing rows get the year appended to their name (and month separator) to
+// stay visually distinct, same as the site has always done by hand ("Anul Nou 2027").
 //
-// Each row's leading dot is accent-colored for a "bonus" weekday holiday and muted
-// gray when the holiday already falls on a weekend, per the redesign's row markers.
+// Each row's leading dot uses the weekday color for a "bonus" weekday holiday and the
+// muted color when the holiday already falls on a weekend. Rows carry their ISO date
+// (data-date) so js/main.js can mark past/today/next rows by date instead of by index,
+// since the month separator rows mean row index no longer maps to holiday index.
 function buildTableRows(hollidays, { baseYear, suffixOtherYears }) {
+    let lastMonthLabel = '';
     return hollidays.map((holliday) => {
         const year = getYear(holliday.date);
-        const name = suffixOtherYears && year !== baseYear ? `${holliday.name} ${year}` : holliday.name;
+        const yearSuffix = suffixOtherYears && year !== baseYear ? ` ${year}` : '';
+        const name = holliday.name + yearSuffix;
         const [day, month] = holliday.date.split('/').map(Number);
+        const monthName = Data.localization.months[month - 1];
+        const monthLabel = monthName + yearSuffix;
         const dayIndex = getDayIndex(holliday.date);
         const dayName = Data.localization.days[dayIndex];
         const isWeekendDay = dayIndex === 0 || dayIndex === 6;
-        const dotClass = isWeekendDay ? 'dot--muted' : 'dot--accent';
-        return `<tr>` +
+        const dotClass = isWeekendDay ? 'dot--weekend' : 'dot--weekday';
+        const iso = toIsoDate(holliday.date);
+
+        let monthRow = '';
+        if (monthLabel !== lastMonthLabel) {
+            monthRow = `<tr class="days-list__month"><td colspan="3">${monthLabel}</td></tr>\n        `;
+            lastMonthLabel = monthLabel;
+        }
+
+        return monthRow +
+            `<tr class="days-list__holliday" data-date="${iso}">` +
             `<td><span class="dot ${dotClass}"></span></td>` +
-            `<td class="days-list__date-cell">${day} ${Data.localization.months[month - 1]} <span class="days-list__weekday">(${dayName})</span></td>` +
-            `<td>${name}</td>` +
+            `<td class="days-list__date-cell">${day} ${monthName} <span class="days-list__weekday">(${dayName})</span></td>` +
+            `<td><div class="days-list__name-cell"><span class="days-list__name">${name}</span></div></td>` +
             `</tr>`;
     }).join('\n        ');
 }
@@ -115,6 +135,11 @@ export function seoContent() {
                 const displayHollidays = isYearPage ? yearHollidays : getDisplayHollidays(Data);
                 const tableRows = buildTableRows(displayHollidays, { baseYear: year, suffixOtherYears: !isYearPage });
                 const yearLinks = buildYearLinks(Data.currentYear, year);
+                // ISO dates for index.html's pre-paint work/fun script: the same two lists
+                // DateUtil.getHolliday checks (this and next year - "today" can't be in the past one).
+                const hollidayDates = JSON.stringify(
+                    Data.hollidays.concat(Data.hollidays_future).map((holliday) => toIsoDate(holliday.date))
+                );
 
                 return html
                     .replaceAll('__TITLE__', title)
@@ -127,7 +152,10 @@ export function seoContent() {
                     .replaceAll('__STATS__', buildStatsSentence(yearHollidays, year))
                     .replaceAll('__TABLE_ROWS__', tableRows)
                     .replaceAll('__YEAR_LINKS__', yearLinks)
+                    .replaceAll('__HOLLIDAY_DATES__', hollidayDates)
                     .replaceAll('__JSON_LD__', buildJsonLd(yearHollidays, year, canonicalUrl))
+                    .replaceAll('__SCENE_WORK__', () => readPartial('scene-work.html'))
+                    .replaceAll('__SCENE_FUN__', () => readPartial('scene-fun.html'))
                     .replaceAll('__VERSION__', pkg.version);
             }
         }

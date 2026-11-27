@@ -1,7 +1,7 @@
 //! version : 0.1.0
 //! license : MIT, authors : Bogdan BUCUR, candeliber.com
 import { Data } from './data.js';
-import { getDisplayHollidays } from './holiday-stats.js';
+import { toIsoDate } from './holiday-stats.js';
 
 var Util = {
 
@@ -18,6 +18,12 @@ var Util = {
         }
 
         return value;
+    },
+
+
+    // Romanian singular vs. plural unit label ("1 oră" / "2 ore").
+    pluralize: function (value, singular, plural) {
+        return value === 1 ? singular : plural;
     }
 };
 
@@ -65,6 +71,26 @@ var DateUtil = {
     },
 
 
+    // YYYY-MM-DD for `date` in *local* time. Never use toISOString() for this: it
+    // converts to UTC, which is still "yesterday" for the first hours after midnight
+    // in Romania.
+    getLocalIsoDate: function (date) {
+
+        return date.getFullYear() + '-' +
+            Util.getDoubleDigitsFromValue(date.getMonth() + 1) + '-' +
+            Util.getDoubleDigitsFromValue(date.getDate());
+    },
+
+
+    // "30 Noiembrie", same format as the holidays table's date column.
+    formatHollidayDate: function (date_str) {
+
+        var date = DateUtil.parseHollidayDate(date_str);
+
+        return date.getDate() + ' ' + Data.localization.months[date.getMonth()];
+    },
+
+
     getDayNameFromDate: function (date) {
 
         var day_index = DateUtil.parseHollidayDate(date).getDay(),
@@ -88,23 +114,21 @@ var DateUtil = {
     },
 
 
-    // Whether `date` (a plain Date, compared by calendar day) is in this or next
-    // year's holiday list - the only two lists that can ever contain "today".
-    isHolliday: function (date) {
+    // The holiday falling on `date` (a plain Date, compared by calendar day), if any,
+    // from this or next year's list - the only two lists that can ever contain "today".
+    getHolliday: function (date) {
 
-        var relevant_hollidays = Data.hollidays.concat(Data.hollidays_future);
+        var relevant_hollidays = Data.hollidays.concat(Data.hollidays_future),
+            iso_date = DateUtil.getLocalIsoDate(date);
 
-        return relevant_hollidays.some(function (holliday) {
-            var holliday_date = DateUtil.parseHollidayDate(holliday.date);
-            return holliday_date.getFullYear() === date.getFullYear() &&
-                holliday_date.getMonth() === date.getMonth() &&
-                holliday_date.getDate() === date.getDate();
+        return relevant_hollidays.find(function (holliday) {
+            return toIsoDate(holliday.date) === iso_date;
         });
     },
 
 
     isFun: function (date) {
-        return DateUtil.isWeekend(date) || DateUtil.isHolliday(date);
+        return DateUtil.isWeekend(date) || !!DateUtil.getHolliday(date);
     }
 };
 
@@ -124,6 +148,11 @@ var View = (function () {
         countdown_minutes = Util.get('countdown_minutes'),
         countdown_seconds = Util.get('countdown_seconds');
 
+    var countdown_days_label    = Util.get('countdown_days_label'),
+        countdown_hours_label   = Util.get('countdown_hours_label'),
+        countdown_minutes_label = Util.get('countdown_minutes_label'),
+        countdown_seconds_label = Util.get('countdown_seconds_label');
+
     var hollidays_list_table = Util.get('days-list');
 
     return {
@@ -136,6 +165,10 @@ var View = (function () {
         countdown_hours: countdown_hours,
         countdown_minutes: countdown_minutes,
         countdown_seconds: countdown_seconds,
+        countdown_days_label: countdown_days_label,
+        countdown_hours_label: countdown_hours_label,
+        countdown_minutes_label: countdown_minutes_label,
+        countdown_seconds_label: countdown_seconds_label,
         hollidays_list_table: hollidays_list_table
     }
 })();
@@ -144,15 +177,26 @@ var View = (function () {
 var ViewUtil = {
 
     /**
-     * Toggles the work/fun theme (via body[data-state]) and the header badge
-     * label, based on whether today is a weekend or holiday.
+     * Toggles the work/fun theme and background scene (via body[data-state]) and
+     * the header badge label, based on whether today is a weekend or holiday.
      */
     setStateBadge: function () {
 
-        var is_fun = DateUtil.isFun(new Date());
+        var today = new Date(),
+            today_holliday = DateUtil.getHolliday(today),
+            is_fun = DateUtil.isWeekend(today) || !!today_holliday,
+            label;
+
+        if (today_holliday) {
+            label = Data.messages.holliday_state.replace('{name}', today_holliday.name);
+        } else if (is_fun) {
+            label = Data.messages.weekend_state;
+        } else {
+            label = Data.messages.work_state;
+        }
 
         View.body.dataset.state = is_fun ? 'fun' : 'work';
-        View.state_badge.innerHTML = is_fun ? Data.messages.fun_state : Data.messages.work_state;
+        View.state_badge.textContent = label;
     },
 
 
@@ -167,7 +211,7 @@ var ViewUtil = {
 
         ViewUtil.nearest_holliday = holliday;
 
-        View.holliday_date.innerHTML = holliday.date;
+        View.holliday_date.innerHTML = DateUtil.formatHollidayDate(holliday.date);
         View.holliday_name.innerHTML = holliday.name;
         View.holliday_day.innerHTML  = day_name;
     },
@@ -175,13 +219,25 @@ var ViewUtil = {
 
     initCountdown: function () {
 
-        var holliday = ViewUtil.nearest_holliday,
-            holliday_date = DateUtil.parseHollidayDate(holliday.date);
+        var current_day = DateUtil.getLocalIsoDate(new Date());
 
-
-        setInterval(function updateCountdown() {
+        // Ticks every second on purpose (it makes the holiday feel closer).
+        function updateCountdown() {
 
             var current_date = new Date(),
+                today = DateUtil.getLocalIsoDate(current_date);
+
+            // At midnight the day's state can change (work <-> fun), and if the
+            // countdown just hit a holiday the next one becomes the target, so
+            // everything date-dependent is refreshed then, without a page reload.
+            if (today !== current_day) {
+                current_day = today;
+                ViewUtil.setStateBadge();
+                ViewUtil.setNearestHolliday();
+                ViewUtil.updateHollidaysList();
+            }
+
+            var holliday_date = DateUtil.parseHollidayDate(ViewUtil.nearest_holliday.date),
                 diff = Math.max(0, holliday_date.getTime() - current_date.getTime());
 
             var days    = Math.floor(diff / 86400000),
@@ -189,66 +245,71 @@ var ViewUtil = {
                 minutes = Math.floor((diff % 3600000) / 60000),
                 seconds = Math.floor((diff % 60000) / 1000);
 
-            View.countdown_days.innerHTML    = Util.getDoubleDigitsFromValue(days);
-            View.countdown_hours.innerHTML   = Util.getDoubleDigitsFromValue(hours);
-            View.countdown_minutes.innerHTML = Util.getDoubleDigitsFromValue(minutes);
-            View.countdown_seconds.innerHTML = Util.getDoubleDigitsFromValue(seconds);
+            View.countdown_days.textContent    = days;
+            View.countdown_hours.textContent   = Util.getDoubleDigitsFromValue(hours);
+            View.countdown_minutes.textContent = Util.getDoubleDigitsFromValue(minutes);
+            View.countdown_seconds.textContent = Util.getDoubleDigitsFromValue(seconds);
 
-            // Recomputed every tick (not just once) so the work/fun theme and
-            // badge flip on their own right at midnight, without a page reload.
-            ViewUtil.setStateBadge();
+            View.countdown_days_label.textContent    = Util.pluralize(days, 'zi', 'zile');
+            View.countdown_hours_label.textContent   = Util.pluralize(hours, 'oră', 'ore');
+            View.countdown_minutes_label.textContent = Util.pluralize(minutes, 'minut', 'minute');
+            View.countdown_seconds_label.textContent = Util.pluralize(seconds, 'secundă', 'secunde');
+        }
 
-        }, 1000);
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
     },
 
 
+    /**
+     * Marks each holiday row in the table as past, future, or highlighted (the
+     * next holiday, tagged "Urmează", and today's holiday, if any, tagged "Azi").
+     * Rows are matched by their build-time data-date (ISO), not by position, since
+     * month separator rows sit between them. Each month separator takes the past
+     * look when the first holiday under it is past.
+     */
     updateHollidaysList: function () {
 
-        var nearest_holliday = DateUtil.getNearestHolliday(),
-            hollidays_list_table = View.hollidays_list_table,
-            tbody = hollidays_list_table.getElementsByTagName('tbody')[0],
-            holliday_rows = tbody.getElementsByTagName('tr');
+        var today = DateUtil.getLocalIsoDate(new Date()),
+            next_date = toIsoDate(ViewUtil.nearest_holliday.date),
+            holliday_rows = View.hollidays_list_table.querySelectorAll('tr.days-list__holliday');
 
-        // The table only ever renders the current year plus next year's Jan 1-2 (see
-        // getDisplayHollidays), so the index lookup has to match that same subset,
-        // not the separate hollidays_past/hollidays/hollidays_future arrays directly.
-        var displayed_hollidays = getDisplayHollidays(Data);
+        holliday_rows.forEach(function (holliday_row) {
 
-        var nearest_holliday_index;
-        displayed_hollidays.forEach(function (holliday, index) {
-            if (holliday === nearest_holliday) {
-                nearest_holliday_index = index;
+            var date = holliday_row.dataset.date,
+                is_past = date < today,
+                is_today = date === today,
+                is_next = date === next_date,
+                name_cell = holliday_row.querySelector('.days-list__name-cell'),
+                old_tag = name_cell.querySelector('.tag'),
+                month_row = holliday_row.previousElementSibling;
+
+            holliday_row.classList.toggle('days-list__holliday--past', is_past);
+            holliday_row.classList.toggle('days-list__holliday--current', is_today || is_next);
+
+            if (month_row && month_row.classList.contains('days-list__month')) {
+                month_row.classList.toggle('days-list__month--past', is_past);
+            }
+
+            if (old_tag) {
+                old_tag.remove();
+            }
+
+            if (is_today || is_next) {
+                var tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.textContent = is_today ? 'Azi' : 'Urmează';
+                name_cell.appendChild(tag);
             }
         });
-
-
-        var index = 0,
-            total_hollidays = holliday_rows.length,
-            nearest_holliday_reached = false;
-        for ( ; index < total_hollidays; index++) {
-
-            var holliday_row = holliday_rows[index];
-
-            if (nearest_holliday_reached) {
-                var row_class = 'days-list__holliday--future';
-            } else if (index === nearest_holliday_index) {
-                var row_class = 'days-list__holliday--current';
-                nearest_holliday_reached = true;
-            } else {
-                var row_class = 'days-list__holliday--past';
-            }
-
-
-            holliday_row.setAttribute('class', row_class);
-        }
     }
 }
 
 
 ViewUtil.setStateBadge();
 ViewUtil.setNearestHolliday();
-ViewUtil.initCountdown();
 ViewUtil.updateHollidaysList();
+ViewUtil.initCountdown();
 
 
 
